@@ -28,7 +28,8 @@ namespace NinjaNye.SearchExtensions.Helpers.ExpressionBuilders.ContainsExpressio
         private static BinaryExpression Build<T>(Expression<Func<T, string>> propertyToSearch, ConstantExpression searchTermExpression, ConstantExpression stringComparisonExpression)
         {
             var coalesceExpression = Expression.Coalesce(propertyToSearch.Body, ExpressionMethods.EmptyStringExpression);
-            var nullCheckExpresion = Expression.Call(coalesceExpression, ExpressionMethods.IndexOfMethodWithComparison, searchTermExpression, stringComparisonExpression);
+            //var nullCheckExpresion = Expression.Call(coalesceExpression, ExpressionMethods.IndexOfMethodWithComparison, searchTermExpression, stringComparisonExpression);
+            var nullCheckExpresion = Expression.Call(coalesceExpression, ExpressionMethods.IndexOfMethod, searchTermExpression);
             return Expression.GreaterThanOrEqual(nullCheckExpresion, ExpressionMethods.ZeroConstantExpression);
         }
 

@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using NinjaNye.SearchExtensions.Levenshtein;
 using NinjaNye.SearchExtensions.Models;
+using System.Reflection;
 
 namespace NinjaNye.SearchExtensions.Helpers.ExpressionBuilders
 {
@@ -21,8 +22,8 @@ namespace NinjaNye.SearchExtensions.Helpers.ExpressionBuilders
         {
             var rankedType = typeof(Ranked<T>);
             var rankedCtor = Expression.New(rankedType);
-            PropertyInfo hitProperty = rankedType.GetProperty("Hits");
-            PropertyInfo itemProperty = rankedType.GetProperty("Item");
+            PropertyInfo hitProperty = rankedType.GetTypeInfo().DeclaredProperties.First(o => o.Name.Equals("Hits"));
+            PropertyInfo itemProperty = rankedType.GetTypeInfo().DeclaredProperties.First(o => o.Name.Equals("Item"));
             var hitValueAssignment = Expression.Bind(hitProperty, hitCountExpression);
             var itemValueAssignment = Expression.Bind(itemProperty, parameterExpression);
             return Expression.MemberInit(rankedCtor, hitValueAssignment, itemValueAssignment);
@@ -39,8 +40,8 @@ namespace NinjaNye.SearchExtensions.Helpers.ExpressionBuilders
         {
             var distanceType = typeof(LevenshteinDistance<T>);
             var distanceCtor = Expression.New(distanceType);
-            PropertyInfo distanceProperty = distanceType.GetProperty("Distance");
-            PropertyInfo itemProperty = distanceType.GetProperty("Item");
+            PropertyInfo distanceProperty = distanceType.GetTypeInfo().DeclaredProperties.First(o => o.Name.Equals("Distance"));
+            PropertyInfo itemProperty = distanceType.GetTypeInfo().DeclaredProperties.First(o => o.Name.Equals("Item"));
             var distanceValueAssignment = Expression.Bind(distanceProperty, distanceExpression);
             var itemValueAssignment = Expression.Bind(itemProperty, parameterExpression);
             return Expression.MemberInit(distanceCtor, distanceValueAssignment, itemValueAssignment);
@@ -110,7 +111,7 @@ namespace NinjaNye.SearchExtensions.Helpers.ExpressionBuilders
         public static Expression<Func<TSource, TType>>[] GetProperties<TSource, TType>()
         {
             var parameter = Expression.Parameter(typeof(TSource));
-            var stringProperties = typeof(TSource).GetProperties()
+            var stringProperties = typeof(TSource).GetTypeInfo().DeclaredProperties
                                                   .Where(property => property.CanRead
                                                                   && property.PropertyType == typeof(TType));
 
